@@ -53,7 +53,7 @@ public class App {
                 userInteractor.broadcastMessage(String.format("Не удалось подключиться к серверу (%s)%n", e.getMessage()), true);
                 userInteractor.broadcastMessage("Попробовать еще (Y/N)?", true);
                 String inp = userInteractor.getData();
-                if (inp.toUpperCase().equals("N")) {
+                if (inp.equalsIgnoreCase("N")) {
                     userInteractor.broadcastMessage("Завершение работы программы", true);
                     System.exit(0);
                 }
@@ -84,6 +84,7 @@ public class App {
 
 
                 if (command instanceof ExecuteScript){
+                    boolean res = true;
                     File f = new File(((ExecuteScript) command).getArgument());
 
                     Scanner fileScanner;
@@ -119,9 +120,16 @@ public class App {
                             }
                         } catch (Exception e) {
                             userInteractor.broadcastMessage("Возникла ошибка при выполнении " + line_num + " строки:\n" + line, true);
+                            res = false;
+                            break;
                         }
                         line_num++;
                     }
+                    if (res){
+                        userInteractor.broadcastMessage("Команды отработали штатно", true);
+                    }
+
+                    continue;
                 }
                 try {
                     serverInteractor.sendObject(command);
