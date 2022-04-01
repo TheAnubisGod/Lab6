@@ -38,21 +38,20 @@ public class App {
         }
 
         try {
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                public void run() {
-                    try {
-                        FileWriter fileWriter = new FileWriter(file);
-                        fileWriter.write(VehicleStackXmlParser.stackToXml(new StackInfo(collection, Vehicle.getMaxId(), initDateTime)));
-                        fileWriter.flush();
-                    } catch (Exception e){
-                        adminInteractor.broadcastMessage(e.getMessage(), true);
-                    }
-
-                    adminInteractor.broadcastMessage("Остановка севера.", true);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    FileWriter fileWriter = new FileWriter(file);
+                    fileWriter.write(VehicleStackXmlParser.stackToXml(new StackInfo(collection, Vehicle.getMaxId(), initDateTime)));
+                    fileWriter.flush();
+                } catch (Exception e){
+                    adminInteractor.broadcastMessage(e.getMessage(), true);
                 }
-            });
+
+                adminInteractor.broadcastMessage("Остановка севера.", true);
+            }));
         } catch (Exception e) {
             adminInteractor.broadcastMessage("Не удалось настроить условие выхода.", true);
+            return;
         }
 
         ServerSocket serverSocket;

@@ -22,6 +22,7 @@ public class App {
     private static NetInteractor serverInteractor;
     private static int PORT;
     private static String address;
+    private static Socket socket;
 
     public static void main(String[] args) {
         try {
@@ -44,7 +45,7 @@ public class App {
         userInteractor.broadcastMessage("Подключение к серверу...", true);
         while (true) {
             try {
-                Socket socket = new Socket(address, PORT);
+                socket = new Socket(address, PORT);
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
                 serverInteractor = new NetInteractor(objectInputStream, objectOutputStream);
@@ -64,8 +65,12 @@ public class App {
     public static void runInteracting() {
         userInteractor.broadcastMessage("Для просмотра списка команд введите 'help'.", true);
         boolean run = true;
-        try {
-            while (run) {
+        boolean recon = false;
+        while (run) {
+            try {
+                if (recon | socket.isClosed() | !socket.isConnected()){
+                    connect();
+                }
                 userInteractor.broadcastMessage("\nВведите команду: ", false);
                 String potentialCommand = userInteractor.getData();
                 if (potentialCommand == null) {
@@ -82,8 +87,7 @@ public class App {
                     ((Preprocessable) command).preprocess(userInteractor);
                 }
 
-
-                if (command instanceof ExecuteScript){
+                if (command instanceof ExecuteScript) {
                     boolean res = true;
                     File f = new File(((ExecuteScript) command).getArgument());
 
@@ -115,7 +119,7 @@ public class App {
 
                             serverInteractor.sendObject(command1);
                             Message msg = (Message) serverInteractor.readObject();
-                            if (!msg.isSuccessful()){
+                            if (!msg.isSuccessful()) {
                                 throw new Exception();
                             }
                         } catch (Exception e) {
@@ -125,7 +129,7 @@ public class App {
                         }
                         line_num++;
                     }
-                    if (res){
+                    if (res) {
                         userInteractor.broadcastMessage("Команды отработали штатно", true);
                     }
 
@@ -134,22 +138,27 @@ public class App {
                 try {
                     serverInteractor.sendObject(command);
                 } catch (IOException e) {
-                    connect();
+                    userInteractor.broadcastMessage("Ошибка", true);
+                    recon = true;
+                    continue;
                 }
                 Message msg;
                 try {
                     msg = (Message) serverInteractor.readObject();
                 } catch (Exception e) {
-                    msg = new Message(e.getMessage(), false);
+                    userInteractor.broadcastMessage("Ошибка", true);
+                    recon = true;
+                    continue;
                 }
 
                 userInteractor.broadcastMessage(msg.getText(), true);
                 if (!msg.isSuccessful()) {
                     run = false;
                 }
+
+            } catch (Exception e) {
+                userInteractor.broadcastMessage("Ошибка " + e.getMessage(), true);
             }
-        } catch (Exception e) {
-            connect();
         }
 
     }
