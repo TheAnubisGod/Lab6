@@ -1,13 +1,11 @@
 package client;
 
 
+import core.commands.ExecuteScript;
 import core.commands.Exit;
 import core.commands.interfaces.Command;
 import core.commands.interfaces.Preprocessable;
-import core.interact.ConsoleInteractor;
-import core.interact.Message;
-import core.interact.NetInteractor;
-import core.interact.UserInteractor;
+import core.interact.*;
 import core.main.CommandRouter;
 
 import java.io.*;
@@ -16,6 +14,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.Scanner;
 
 
 public class App {
@@ -81,6 +80,48 @@ public class App {
                 }
                 if (command instanceof Preprocessable) {
                     ((Preprocessable) command).preprocess(userInteractor);
+                }
+
+
+                if (command instanceof ExecuteScript){
+                    File f = new File(((ExecuteScript) command).getArgument());
+
+                    Scanner fileScanner;
+                    try {
+                        fileScanner = new Scanner(f);
+                    } catch (FileNotFoundException e) {
+                        userInteractor.broadcastMessage("Такого файла не существует!", true);
+                        continue;
+                    }
+                    int line_num = 1;
+                    while (fileScanner.hasNextLine()) {
+                        String line = fileScanner.nextLine();
+                        if (line.trim().isEmpty()) {
+                            continue;
+                        }
+                        try {
+                            ScriptInteractor scriptInteractor = new ScriptInteractor(fileScanner);
+                            Command command1 = CommandRouter.getCommand(line, true, scriptInteractor);
+                            if (command1 == null) {
+                                continue;
+                            }
+                            if (command1 instanceof Exit) {
+                                return;
+                            }
+                            if (command1 instanceof Preprocessable) {
+                                ((Preprocessable) command1).preprocess(scriptInteractor);
+                            }
+
+                            serverInteractor.sendObject(command1);
+                            Message msg = (Message) serverInteractor.readObject();
+                            if (!msg.isSuccessful()){
+                                throw new Exception();
+                            }
+                        } catch (Exception e) {
+                            userInteractor.broadcastMessage("Возникла ошибка при выполнении " + line_num + " строки:\n" + line, true);
+                        }
+                        line_num++;
+                    }
                 }
                 try {
                     serverInteractor.sendObject(command);

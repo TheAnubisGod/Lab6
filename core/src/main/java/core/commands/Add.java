@@ -27,7 +27,9 @@ public class Add implements Command, Preprocessable {
 
     @Override
     public void preprocess(UserInteractor interactor) {
-        interactor.broadcastMessage("Добавление элемента в коллекцию.", true);
+        if (!fromScript) {
+            interactor.broadcastMessage("Добавление элемента в коллекцию.", true);
+        }
         this.vehicle = createVehicle(fromScript, interactor);
     }
 

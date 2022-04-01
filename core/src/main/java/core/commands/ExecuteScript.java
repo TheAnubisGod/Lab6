@@ -1,5 +1,6 @@
 package core.commands;
 
+import core.commands.interfaces.ClientCommand;
 import core.commands.interfaces.Command;
 import core.essentials.Vehicle;
 import core.interact.Message;
@@ -20,7 +21,7 @@ import java.util.Stack;
  * @author Владислав Дюжев
  * @version 1.0
  */
-public class ExecuteScript implements Command {
+public class ExecuteScript implements Command, ClientCommand {
     private final String argument;
 
     public ExecuteScript(ArrayList<String> args) {
@@ -50,11 +51,13 @@ public class ExecuteScript implements Command {
                 }
 //                command.execute(stack, interactor);
             } catch (Exception e) {
-//                interactor.broadcastMessage("Возникла ошибка при выполнении " + line_num + " строки:\n" + line, true);
-                break;
+                return new Message("Возникла ошибка при выполнении " + line_num + " строки:\n" + line, false);
             }
             line_num++;
         }
-        return new Message("", false);
+        return new Message("Команды исполнены исправно.", true);
+    }
+    public String getArgument(){
+        return argument;
     }
 }
