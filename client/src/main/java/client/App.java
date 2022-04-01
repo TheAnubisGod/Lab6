@@ -68,8 +68,9 @@ public class App {
         boolean recon = false;
         while (run) {
             try {
-                if (recon | socket.isClosed() | !socket.isConnected()){
+                if (recon | socket.isClosed() | !socket.isConnected()) {
                     connect();
+                    recon = false;
                 }
                 userInteractor.broadcastMessage("\nВведите команду: ", false);
                 String potentialCommand = userInteractor.getData();
