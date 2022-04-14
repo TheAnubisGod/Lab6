@@ -1,10 +1,9 @@
-package core.commands;
+package server.commands;
 
-import core.commands.interfaces.Command;
+import server.commands.interfaces.Command;
 import core.essentials.StackInfo;
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 import core.main.VehicleStackXmlParser;
 
 import java.io.File;

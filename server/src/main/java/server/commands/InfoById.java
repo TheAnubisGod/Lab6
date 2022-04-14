@@ -1,10 +1,11 @@
-package core.commands;
+package server.commands;
 
-import core.commands.interfaces.Command;
-import core.commands.interfaces.IdCommand;
+import core.precommands.IdPrecommand;
+import core.precommands.Precommand;
+import server.commands.interfaces.Command;
+import server.commands.interfaces.IdCommand;
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -20,6 +21,10 @@ public class InfoById implements Command, IdCommand {
 
     public InfoById(ArrayList<String> args) {
         this.argument = args.get(0);
+    }
+
+    public InfoById(Precommand precommand) {
+        this.argument = ((IdPrecommand) precommand).getId();
     }
 
     @Override

@@ -1,9 +1,8 @@
-package core.commands;
+package server.commands;
 
-import core.commands.interfaces.Command;
+import server.commands.interfaces.Command;
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 
 import java.util.Stack;
 
@@ -21,14 +20,14 @@ public class Show implements Command {
 
     @Override
     public Message execute(Stack<Vehicle> stack) {
-        StringBuilder str = new StringBuilder();
+        StringBuilder str;
         if (stack.size() == 0) {
             return new Message("В коллекции нет элементов.", true);
         } else {
             str = new StringBuilder("Все элементы коллекции:\n");
         }
         for (Vehicle vehicle : stack) {
-            str.append(vehicle.toString()+"\n");
+            str.append(vehicle.toString()).append("\n");
         }
         return new Message(str + "Всего: " + stack.size() + ".\n", true);
     }

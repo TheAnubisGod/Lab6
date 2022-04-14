@@ -1,14 +1,15 @@
 package server;
 
-import core.commands.Save;
-import core.commands.interfaces.Command;
-import core.commands.interfaces.DateCommand;
+import server.commands.interfaces.Command;
+import server.commands.interfaces.DateCommand;
 import core.essentials.StackInfo;
 import core.essentials.Vehicle;
 import core.interact.ConsoleInteractor;
 import core.interact.Message;
 import core.interact.UserInteractor;
+import server.commands.CommandRouter;
 import core.main.VehicleStackXmlParser;
+import core.precommands.Precommand;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -43,7 +44,7 @@ public class App {
                     FileWriter fileWriter = new FileWriter(file);
                     fileWriter.write(VehicleStackXmlParser.stackToXml(new StackInfo(collection, Vehicle.getMaxId(), initDateTime)));
                     fileWriter.flush();
-                } catch (Exception e){
+                } catch (Exception e) {
                     adminInteractor.broadcastMessage(e.getMessage(), true);
                 }
 
@@ -75,12 +76,17 @@ public class App {
                 ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                 ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
                 while (!(socket.isClosed())) {
-                    Command command = (Command) inputStream.readObject();
+                    Precommand preCommand = (Precommand) inputStream.readObject();
                     Message msg;
+                    Command command = CommandRouter.getCommand(preCommand);
                     if (command instanceof DateCommand) {
                         msg = ((DateCommand) command).execute(collection, initDateTime);
                     } else {
-                        msg = command.execute(collection);
+                        if (command != null) {
+                            msg = command.execute(collection);
+                        } else {
+                            msg = new Message("Ошибка при обработке команды.", false);
+                        }
                     }
                     outputStream.writeObject(msg);
                 }

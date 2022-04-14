@@ -1,15 +1,12 @@
-package core.commands;
+package server.commands;
 
-import core.commands.interfaces.Command;
+import server.commands.interfaces.Command;
 import core.essentials.FuelType;
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 
 import java.util.HashSet;
 import java.util.Stack;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Класс команды вывода уникальных видов топлива.
@@ -29,7 +26,7 @@ public class PrintUniqueFuelType implements Command {
         HashSet<FuelType> hashSet = new HashSet<>();
         int num = 0;
         for (Vehicle vehicle : stack) {
-            if (!hashSet.contains(vehicle.getFuelType())) {
+            if (vehicle.getFuelType() != null && !hashSet.contains(vehicle.getFuelType())) {
                 hashSet.add(vehicle.getFuelType());
                 str.append(vehicle.getFuelType().toString()).append("\n");
                 num++;

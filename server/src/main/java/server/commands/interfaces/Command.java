@@ -1,8 +1,7 @@
-package core.commands.interfaces;
+package server.commands.interfaces;
 
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 
 import java.io.Serializable;
 import java.util.Stack;

@@ -1,12 +1,8 @@
 package client;
 
 
-import core.commands.ExecuteScript;
-import core.commands.Exit;
-import core.commands.interfaces.Command;
-import core.commands.interfaces.Preprocessable;
 import core.interact.*;
-import core.main.CommandRouter;
+import core.precommands.Precommand;
 
 import java.io.*;
 import java.net.Socket;
@@ -48,9 +44,9 @@ public class App {
                 return;
             } catch (IOException e) {
                 userInteractor.broadcastMessage(String.format("Не удалось подключиться к серверу (%s)%n", e.getMessage()), true);
-                userInteractor.broadcastMessage("Попробовать еще (Y/N)?", true);
+                userInteractor.broadcastMessage("Попробовать еще (Y/n)?", true);
                 String inp = userInteractor.getData();
-                if (inp.equalsIgnoreCase("N")) {
+                if (inp.equalsIgnoreCase("n")) {
                     userInteractor.broadcastMessage("Завершение работы программы", true);
                     System.exit(0);
                 }
@@ -73,20 +69,22 @@ public class App {
                 if (potentialCommand == null) {
                     continue;
                 }
-                Command command = CommandRouter.getCommand(potentialCommand, false, userInteractor);
-                if (command == null) {
+                Precommand precommand = PreCommandRouter.getCommand(potentialCommand, false, userInteractor);
+                if (precommand == null) {
                     continue;
                 }
-                if (command instanceof Exit) {
+                if (precommand.getCommandName().equals("exit")) {
                     return;
                 }
-                if (command instanceof Preprocessable) {
-                    ((Preprocessable) command).preprocess(userInteractor);
-                }
+//                if (precommand instanceof Preprocessable) {
+//                    ((Preprocessable) precommand).preprocess(userInteractor);
+//                }
 
-                if (command instanceof ExecuteScript) {
+                if (precommand.getCommandName().equals("execute_script")) {
                     boolean res = true;
-                    File f = new File(((ExecuteScript) command).getArgument());
+                    String filename;
+                    filename = (String) precommand.getArg();
+                    File f = new File(filename);
 
                     Scanner fileScanner;
                     try {
@@ -103,18 +101,18 @@ public class App {
                         }
                         try {
                             ScriptInteractor scriptInteractor = new ScriptInteractor(fileScanner);
-                            Command command1 = CommandRouter.getCommand(line, true, scriptInteractor);
-                            if (command1 == null) {
+                            Precommand precommand1 = PreCommandRouter.getCommand(line, true, scriptInteractor);
+                            if (precommand1 == null) {
                                 continue;
                             }
-                            if (command1 instanceof Exit) {
+                            if (precommand1.getCommandName().equals("exit")) {
                                 return;
                             }
-                            if (command1 instanceof Preprocessable) {
-                                ((Preprocessable) command1).preprocess(scriptInteractor);
-                            }
+//                            if (command1 instanceof Preprocessable) {
+//                                ((Preprocessable) command1).preprocess(scriptInteractor);
+//                            }
 
-                            serverInteractor.sendObject(command1);
+                            serverInteractor.sendObject(precommand1);
                             Message msg = (Message) serverInteractor.readObject();
                             if (!msg.isSuccessful()) {
                                 throw new Exception();
@@ -133,7 +131,7 @@ public class App {
                     continue;
                 }
                 try {
-                    serverInteractor.sendObject(command);
+                    serverInteractor.sendObject(precommand);
                 } catch (IOException e) {
                     userInteractor.broadcastMessage("Ошибка", true);
                     recon = true;

@@ -1,12 +1,12 @@
 package server;
 
-import core.commands.interfaces.Command;
+import core.precommands.BasicPrecommand;
+import server.commands.interfaces.Command;
 import core.essentials.StackInfo;
 import core.essentials.Vehicle;
-import core.interact.NetInteractor;
 import core.interact.ConsoleInteractor;
 import core.interact.UserInteractor;
-import core.main.CommandRouter;
+import server.commands.CommandRouter;
 import core.main.VehicleStackXmlParser;
 
 import java.io.*;
@@ -95,7 +95,7 @@ public abstract class CollectionMaster {
             if (potentialCommand == null) {
                 continue;
             }
-            Command command = CommandRouter.getCommand(potentialCommand, false, interactor);
+            Command command = CommandRouter.getCommand(new BasicPrecommand("Lol"));
             if (command != null) {
 //                run = command.execute(collection);
             }

@@ -1,10 +1,9 @@
-package core.commands;
+package server.commands;
 
-import core.commands.interfaces.Command;
-import core.commands.interfaces.IdCommand;
+import server.commands.interfaces.Command;
+import server.commands.interfaces.IdCommand;
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -21,6 +20,11 @@ public class RemoveById implements Command, IdCommand {
     public RemoveById(ArrayList<String> args) {
         this.argument = args.get(0);
     }
+
+    public RemoveById(String arg) {
+        this.argument = arg;
+    }
+
 
     @Override
     public Message execute(Stack<Vehicle> stack) {

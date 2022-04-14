@@ -1,10 +1,10 @@
-package core.commands;
+package server.commands;
 
-import core.commands.interfaces.IdCommand;
-import core.commands.interfaces.Preprocessable;
+import core.precommands.ObjectIdPrecommand;
+import core.precommands.Precommand;
+import server.commands.interfaces.IdCommand;
 import core.essentials.Vehicle;
 import core.interact.Message;
-import core.interact.UserInteractor;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -23,13 +23,24 @@ public class Update extends Add implements IdCommand {
         this.argument = args.get(0);
     }
 
+    public Update(Precommand precommand){
+        super(precommand);
+        ObjectIdPrecommand objectIdPrecommand = (ObjectIdPrecommand) precommand;
+        this.argument = objectIdPrecommand.getId();
+    }
+
     @Override
     public Message execute(Stack<Vehicle> stack) {
+        if (this.vehicle.getName() == null | this.vehicle.getCoordinates() == null| this.vehicle.getCreationDate() == null
+                | this.vehicle.getType() == null | this.vehicle.getEnginePower() <= 0){
+            return new Message("Ошибка передачи объекта (недопустимые значения полей).", false);
+        }
         int index = idArgToIndex(argument, stack);
         if (index == -1) {
             return new Message("Неверный аргумент. Ожидается число (id). Или данного элемента не существует.", true);
         }
         stack.remove(index);
+        vehicle.generateId(Integer.parseInt(argument));
         stack.add(index, vehicle);
         return new Message("Элемент успешно обновлен.", true);
     }

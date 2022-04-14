@@ -1,46 +1,14 @@
-package core.commands;
+package core.precommands.argcreation;
 
-import core.commands.interfaces.Command;
-import core.commands.interfaces.Preprocessable;
 import core.essentials.FuelType;
 import core.essentials.Vehicle;
 import core.essentials.VehicleType;
-import core.interact.Message;
 import core.interact.UserInteractor;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
-/**
- * Класс команды добавления элемента.
- *
- * @author Владислав Дюжев
- * @version 1.0
- */
-public class Add implements Command, Preprocessable {
-    protected final boolean fromScript;
-    protected Vehicle vehicle;
-
-    public Add(boolean from_script) {
-        this.fromScript = from_script;
-    }
-
-    @Override
-    public void preprocess(UserInteractor interactor) {
-        if (!fromScript) {
-            interactor.broadcastMessage("Добавление элемента в коллекцию.", true);
-        }
-        this.vehicle = createVehicle(fromScript, interactor);
-    }
-
-    @Override
-    public Message execute(Stack<Vehicle> stack) {
-        this.vehicle.generateId();
-        stack.add(this.vehicle);
-        return new Message("Элемент успешно добавлен.", true);
-    }
-
-    private void chooseVehicleType(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
+public abstract class VehicleGenerator {
+    private static void chooseVehicleType(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
         boolean res = false;
         VehicleType vehicleType;
         if (!from_script) {
@@ -68,7 +36,7 @@ public class Add implements Command, Preprocessable {
         }
     }
 
-    private void chooseFuelType(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
+    private static void chooseFuelType(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
         boolean res = false;
         FuelType fuelType;
         if (!from_script) {
@@ -100,7 +68,7 @@ public class Add implements Command, Preprocessable {
         }
     }
 
-    private void chooseName(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
+    private static void chooseName(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
         boolean res = false;
         while (!res) {
             if (!from_script) {
@@ -117,7 +85,7 @@ public class Add implements Command, Preprocessable {
         }
     }
 
-    private void chooseEnginePower(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
+    private static void chooseEnginePower(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
         boolean res = false;
         while (!res) {
             if (!from_script) {
@@ -137,7 +105,7 @@ public class Add implements Command, Preprocessable {
         }
     }
 
-    private void chooseCoordinates(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
+    private static void chooseCoordinates(Vehicle vehicle, boolean from_script, UserInteractor interactor) {
         boolean res = false;
         while (!res) {
             if (!from_script) {
@@ -180,7 +148,7 @@ public class Add implements Command, Preprocessable {
         }
     }
 
-    protected Vehicle createVehicle(boolean from_script, UserInteractor interactor) {
+    public static Vehicle createVehicle(boolean from_script, UserInteractor interactor) {
         Vehicle vehicle = new Vehicle();
 
         chooseVehicleType(vehicle, from_script, interactor);
@@ -191,6 +159,4 @@ public class Add implements Command, Preprocessable {
 
         return vehicle;
     }
-
-
 }

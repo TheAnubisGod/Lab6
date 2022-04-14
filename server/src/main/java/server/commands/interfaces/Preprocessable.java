@@ -1,4 +1,4 @@
-package core.commands.interfaces;
+package server.commands.interfaces;
 
 import core.interact.UserInteractor;
 

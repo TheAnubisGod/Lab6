@@ -1,13 +1,11 @@
-package core.commands.interfaces;
+package server.commands.interfaces;
 
 import core.essentials.Vehicle;
-import core.interact.UserInteractor;
 
 import java.io.Serializable;
 import java.util.OptionalInt;
 import java.util.Stack;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Команды, принимающие в качестве аргумента id.
